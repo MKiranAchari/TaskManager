@@ -17,6 +17,125 @@ from kivy.uix.boxlayout import BoxLayout  # Fix missing import for BoxLayout
 import sqlite3
 
 
+kv = """
+MDScreenManager:
+    DashboardScreen:
+    TaskScreen:
+    CalendarScreen:
+
+<DashboardScreen>:
+    name: 'dashboard'
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: dp(20)
+        padding: dp(20)
+
+        MDLabel:
+            id: current_date_label
+            text: "Today's Date: "
+            halign: 'center'
+
+        MDRaisedButton:
+            text: 'Select Date'
+            pos_hint: {'center_x': 0.5}
+            on_release: app.show_calendar()
+
+        MDRaisedButton:
+            text: 'Add Task for Today'
+            pos_hint: {'center_x': 0.5}
+            on_release: app.show_tasks_today()
+
+        MDLabel:
+            id: tasks_today_label
+            text: "Tasks Today: "
+            halign: 'center'
+
+<TaskScreen>:
+    name: 'task'
+    MDBoxLayout:
+        orientation: 'vertical'
+        padding: dp(20)
+        spacing: dp(10)
+
+        MDLabel:
+            id: task_date_label
+            text: 'Tasks for: '
+            halign: 'center'
+            font_style: 'H5'
+
+        ScrollView:
+            MDList:
+                id: task_list
+
+        MDTextField:
+            id: new_task
+            hint_text: 'Enter new task'
+            mode: 'rectangle'
+
+        MDRaisedButton:
+            text: 'Add Task'
+            pos_hint: {'center_x': 0.5}
+            on_release: root.add_task()  
+
+        MDRaisedButton:
+            text: 'Back to Dashboard'
+            pos_hint: {'center_x': 0.5}
+            on_release: app.go_back_dashboard()
+
+<CalendarScreen>:
+    name: 'calendar'
+    MDBoxLayout:
+        orientation: 'vertical'
+        padding: dp(20)
+        spacing: dp(10)
+
+        MDLabel:
+            id: month_label
+            text: 'Pick a Date'
+            halign: 'center'
+            font_style: 'H5'
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: dp(40)
+            spacing: dp(10)
+
+            MDRaisedButton:
+                text: '<'
+                on_release: app.change_month(-1)
+
+            MDRaisedButton:
+                text: '<<'
+                on_release: app.change_year(-1)
+
+            MDLabel:
+                id: calendar_month_label
+                text: ''  # Set in Python
+                halign: 'center'
+
+            MDRaisedButton:
+                text: '>>'
+                on_release: app.change_year(1)
+
+            MDRaisedButton:
+                text: '>'
+                on_release: app.change_month(1)
+
+        GridLayout:
+            cols: 7
+            row_default_height: "48dp"
+            padding: dp(10)
+            spacing: dp(5)
+            id: calendar_grid
+
+        MDRaisedButton:
+            text: 'Back to Dashboard'
+            pos_hint: {'center_x': 0.5}
+            on_release: app.go_back_dashboard()
+"""
+
+
 class TaskDatabase:
     def __init__(self, db_name="tasks.db"):
         """Initialize the SQLite database connection."""
@@ -297,7 +416,7 @@ class CalendarApp(MDApp):
         
         # Initialize the database once when the app starts
         self.db = TaskDatabase()  # Initialize the database connection
-        return Builder.load_string(rf'./main.kv')
+        return Builder.load_string(kv)
 
     def show_calendar(self):
         """Display the calendar screen"""
