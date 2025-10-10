@@ -8,6 +8,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.Calendar;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import com.example.taskmanager.database.AppDatabase;
 import com.example.taskmanager.models.Task;
 
@@ -40,11 +43,16 @@ public class AddTaskActivity extends AppCompatActivity {
                 return;
             }
 
-            AppDatabase db = AppDatabase.getInstance(this);
-            Task task = new Task(title, desc, finalDateTime, false);
-            long newId = db.taskDao().insertTask(task); // returns generated id (not strictly needed here)
-            Toast.makeText(this, "Task Saved: " + title, Toast.LENGTH_SHORT).show();
-            finish();
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            executor.execute(() -> {
+                AppDatabase db = AppDatabase.getInstance(this);
+                Task task = new Task(title, desc, finalDateTime, false);
+                long newId = db.taskDao().insertTask(task);
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Task Saved: " + title, Toast.LENGTH_SHORT).show();
+                    finish();
+                });
+            });
         });
     }
 

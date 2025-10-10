@@ -66,8 +66,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                     AppDatabase db = AppDatabase.getInstance(context);
 
                     // Remove from list immediately
-                    taskList.remove(position);
-                    notifyItemRemoved(position);
+                    if (!taskList.isEmpty()){
+                        taskList.remove(position);
+                        notifyItemRemoved(position);
+                    }
 
                     // Delete in background
                     Executors.newSingleThreadExecutor().execute(() -> db.taskDao().deleteTask(task));
@@ -94,12 +96,17 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 .setTitle("Mark as Completed")
                 .setMessage("Mark \"" + task.getTitle() + "\" as completed and move to History?")
                 .setPositiveButton("Yes", (dialog, which) -> {
-                    AppDatabase db = AppDatabase.getInstance(context);
                     task.setCompleted(true);
-                    db.taskDao().updateTask(task);
-                    taskList.remove(position);
-                    notifyItemRemoved(position);
-                    Toast.makeText(context, "Task moved to History", Toast.LENGTH_SHORT).show();
+                    Executors.newSingleThreadExecutor().execute(() -> {
+                        AppDatabase db = AppDatabase.getInstance(context);
+                        db.taskDao().updateTask(task);
+
+                        ((MainActivity) context).runOnUiThread(() -> {
+                            taskList.remove(position);
+                            notifyItemRemoved(position);
+                            Toast.makeText(context, "Task moved to History", Toast.LENGTH_SHORT).show();
+                        });
+                    });
                 })
                 .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
                 .show();

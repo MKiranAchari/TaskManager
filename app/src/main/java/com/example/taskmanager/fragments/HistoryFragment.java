@@ -15,6 +15,8 @@ import com.example.taskmanager.database.AppDatabase;
 import com.example.taskmanager.models.Task;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class HistoryFragment extends Fragment {
 
@@ -37,11 +39,15 @@ public class HistoryFragment extends Fragment {
     }
 
     private void loadTasks() {
-        AppDatabase db = AppDatabase.getInstance(getContext());
-        List<Task> dbTasks = db.taskDao().getCompletedTasks();
-        taskList = new ArrayList<>(dbTasks);
-        adapter = new TaskAdapter(taskList, false); // hide complete button
-        recyclerView.setAdapter(adapter);
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            List<Task> dbTasks = AppDatabase.getInstance(getContext()).taskDao().getPendingTasks();
+            getActivity().runOnUiThread(() -> {
+                taskList = new ArrayList<>(dbTasks);
+                adapter = new TaskAdapter(taskList, false);
+                recyclerView.setAdapter(adapter);
+            });
+        });
     }
 
     @Override
@@ -49,7 +55,7 @@ public class HistoryFragment extends Fragment {
         super.onResume();
         if (adapter != null) {
             taskList.clear();
-            taskList.addAll(AppDatabase.getInstance(getContext()).taskDao().getCompletedTasks());
+            Executors.newSingleThreadExecutor().execute(() -> taskList.addAll(AppDatabase.getInstance(getContext()).taskDao().getCompletedTasks()));
             adapter.notifyDataSetChanged();
         } else {
             loadTasks();
