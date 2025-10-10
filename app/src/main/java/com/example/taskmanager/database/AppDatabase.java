@@ -22,7 +22,7 @@ public abstract class AppDatabase extends RoomDatabase {
                                     AppDatabase.class,
                                     "task_db"
                             )
-                            .allowMainThreadQueries() // ok for learning; use background threads in prod
+//                            .allowMainThreadQueries() // ok for learning; use background threads in prod
                             .build();
                 }
             }

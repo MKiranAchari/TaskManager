@@ -15,6 +15,8 @@ import com.example.taskmanager.database.AppDatabase;
 import com.example.taskmanager.models.Task;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class HomeFragment extends Fragment {
 
@@ -38,11 +40,15 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadTasks() {
-        AppDatabase db = AppDatabase.getInstance(getContext());
-        List<Task> dbTasks = db.taskDao().getPendingTasks();
-        taskList = new ArrayList<>(dbTasks);
-        adapter = new TaskAdapter(taskList, true); // show complete button
-        recyclerView.setAdapter(adapter);
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            List<Task> dbTasks = AppDatabase.getInstance(getContext()).taskDao().getPendingTasks();
+            getActivity().runOnUiThread(() -> {
+                taskList = new ArrayList<>(dbTasks);
+                adapter = new TaskAdapter(taskList, true);
+                recyclerView.setAdapter(adapter);
+            });
+        });
     }
 
     @Override
@@ -50,8 +56,10 @@ public class HomeFragment extends Fragment {
         super.onResume();
         // refresh when returning from AddTaskActivity or other changes
         if (adapter != null) {
-            taskList.clear();
-            taskList.addAll(AppDatabase.getInstance(getContext()).taskDao().getPendingTasks());
+            Executors.newSingleThreadExecutor().execute(() -> {
+                taskList.clear();
+                taskList.addAll(AppDatabase.getInstance(getContext()).taskDao().getPendingTasks());
+            });
             adapter.notifyDataSetChanged();
         } else {
             loadTasks();
