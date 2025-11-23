@@ -1,14 +1,18 @@
-package com.example.taskmanager;
+package com.example.taskmanager.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
-import com.example.taskmanager.fragments.HomeFragment;
-import com.example.taskmanager.fragments.HistoryFragment;
+
+import com.example.taskmanager.R;
+import com.example.taskmanager.ui.add.AddTaskActivity;
+import com.example.taskmanager.ui.home.HomeFragment;
+import com.example.taskmanager.ui.home.HistoryFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -17,39 +21,29 @@ public class MainActivity extends AppCompatActivity {
 
     TabLayout tabLayout;
     ViewPager2 viewPager;
-    FloatingActionButton fabAddTask;
+    FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main); // keep your layout
 
         tabLayout = findViewById(R.id.tabLayout);
         viewPager = findViewById(R.id.viewPager);
-        fabAddTask = findViewById(R.id.fabAddTask);
+        fab = findViewById(R.id.fabAddTask);
 
         viewPager.setAdapter(new FragmentStateAdapter(this) {
-            @NonNull
-            @Override
+            @NonNull @Override
             public Fragment createFragment(int position) {
-                if (position == 0) return new HomeFragment();
-                else return new HistoryFragment();
+                return position == 0 ? new HomeFragment() : new HistoryFragment();
             }
-
-            @Override
-            public int getItemCount() {
-                return 2;
-            }
+            @Override public int getItemCount() { return 2; }
         });
 
         new TabLayoutMediator(tabLayout, viewPager,
-                (tab, position) -> tab.setText(position == 0 ? "Pending" : "History")
+                (tab, pos) -> tab.setText(pos == 0 ? "Pending" : "History")
         ).attach();
 
-        fabAddTask.setOnClickListener(v -> {
-            // will open AddTaskActivity (next step)
-            Intent intent = new Intent(MainActivity.this, AddTaskActivity.class);
-            startActivity(intent);
-        });
+        fab.setOnClickListener(v -> startActivity(new Intent(this, AddTaskActivity.class)));
     }
 }
