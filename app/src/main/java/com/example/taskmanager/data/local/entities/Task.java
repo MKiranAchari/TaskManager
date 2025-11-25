@@ -13,12 +13,14 @@ public class Task {
     private String description;
     private String dateTime;
     private boolean completed;
+    private String priority;
 
-    public Task(String title, String description, String dateTime, boolean completed) {
+    public Task(String title, String description, String dateTime, boolean completed, String priority) {
         this.title = title;
         this.description = description;
         this.dateTime = dateTime;
         this.completed = completed;
+        this.priority = priority;
     }
 
     // Getters & setters
@@ -30,4 +32,5 @@ public class Task {
     public String getDateTime() { return dateTime; }
     public boolean isCompleted() { return completed; }
     public void setCompleted(boolean completed) { this.completed = completed; }
+    public String getPriority() { return priority; }
 }
