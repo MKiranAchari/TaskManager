@@ -1,10 +1,12 @@
 package com.example.taskmanager.ui.add;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +23,7 @@ public class AddTaskActivity extends AppCompatActivity {
     EditText editTitle, editDesc, editDateTime;
     Button btnSave;
     String finalDateTime = "";
+    Spinner prioritySpinner;
 
     private TaskViewModel vm;
 
@@ -32,6 +35,7 @@ public class AddTaskActivity extends AppCompatActivity {
         editTitle = findViewById(R.id.editTitle);
         editDesc = findViewById(R.id.editDesc);
         editDateTime = findViewById(R.id.editDateTime);
+        prioritySpinner = findViewById(R.id.prioritySpinner);
         btnSave = findViewById(R.id.btnSaveTask);
 
         vm = new ViewModelProvider(this).get(TaskViewModel.class);
@@ -43,11 +47,12 @@ public class AddTaskActivity extends AppCompatActivity {
     private void saveTask() {
         String title = editTitle.getText().toString().trim();
         String desc = editDesc.getText().toString().trim();
+        String prior = prioritySpinner.getSelectedItem().toString().trim();
         if (title.isEmpty() || desc.isEmpty() || finalDateTime.isEmpty()) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
-        Task t = new Task(title, desc, finalDateTime, false);
+        Task t = new Task(title, desc, finalDateTime, false, prior);
         vm.insert(t);
         Toast.makeText(this, "Task saved", Toast.LENGTH_SHORT).show();
         finish();
@@ -57,7 +62,7 @@ public class AddTaskActivity extends AppCompatActivity {
         final Calendar c = Calendar.getInstance();
         DatePickerDialog dp = new DatePickerDialog(this,
                 (view, year, month, dayOfMonth) -> {
-                    TimePickerDialog tp = new TimePickerDialog(this,
+                    @SuppressLint("DefaultLocale") TimePickerDialog tp = new TimePickerDialog(this,
                             (timeView, hourOfDay, minute) -> {
                                 finalDateTime = String.format("%02d-%02d-%04d %02d:%02d",
                                         dayOfMonth, month + 1, year, hourOfDay, minute);

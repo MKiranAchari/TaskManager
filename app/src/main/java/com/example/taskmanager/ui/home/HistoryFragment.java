@@ -36,7 +36,7 @@ public class HistoryFragment extends Fragment {
                 vm.delete(task);
                 Snackbar.make(requireActivity().findViewById(android.R.id.content),
                                 "Task deleted", Snackbar.LENGTH_LONG)
-                        .setAction("UNDO", v -> vm.insert(new Task(task.getTitle(), task.getDescription(), task.getDateTime(), task.isCompleted())))
+                        .setAction("UNDO", v -> vm.insert(new Task(task.getTitle(), task.getDescription(), task.getDateTime(), task.isCompleted(), task.getPriority())))
                         .show();
             }
             @Override public void onComplete(Task task) {
