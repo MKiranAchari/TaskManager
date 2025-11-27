@@ -47,7 +47,7 @@ public class AddTaskActivity extends AppCompatActivity {
     private void saveTask() {
         String title = editTitle.getText().toString().trim();
         String desc = editDesc.getText().toString().trim();
-        Integer prior = prioritySpinner.getSelectedItemPosition();
+        String prior = prioritySpinner.getSelectedItem().toString().trim();
         if (title.isEmpty() || desc.isEmpty() || finalDateTime.isEmpty()) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;

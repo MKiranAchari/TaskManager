@@ -13,9 +13,9 @@ public class Task {
     private String description;
     private String dateTime;
     private boolean completed;
-    private Integer priority;
+    private String priority;
 
-    public Task(String title, String description, String dateTime, boolean completed, Integer priority) {
+    public Task(String title, String description, String dateTime, boolean completed, String priority) {
         this.title = title;
         this.description = description;
         this.dateTime = dateTime;
@@ -32,5 +32,5 @@ public class Task {
     public String getDateTime() { return dateTime; }
     public boolean isCompleted() { return completed; }
     public void setCompleted(boolean completed) { this.completed = completed; }
-    public Integer getPriority() { return priority; }
+    public String getPriority() { return priority; }
 }
