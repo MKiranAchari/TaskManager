@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@drawable/dialog_bg">
+
+    <!-- First row: Title + Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Title expands dynamically -->
+        <TextView
+            android:id="@+id/dialog_Title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Task Title"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:paddingBottom="10dp" />
+
+        <!-- Edit Button -->
+        <Button
+            android:id="@+id/btnEdit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Edit" />
+
+        <!-- Delete Button -->
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete" />
+    </LinearLayout>
+
+    <!-- Second row: Description -->
+    <TextView
+        android:id="@+id/dialog_Desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Task description goes here..."
+        android:layout_marginTop="10dp"
+        android:textSize="16sp"
+        android:paddingTop="8dp"
+        android:textColor="@android:color/darker_gray" />
+
+    <!-- Third row: Time -->
+    <TextView
+        android:id="@+id/dialog_Time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Task time here..."
+        android:layout_marginTop="10dp"
+        android:textSize="14sp"
+        android:paddingTop="4dp"
+        android:textColor="@android:color/holo_blue_dark" />
+
+</LinearLayout>

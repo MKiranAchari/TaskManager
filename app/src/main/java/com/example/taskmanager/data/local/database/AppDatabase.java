@@ -9,7 +9,7 @@ import androidx.room.RoomDatabase;
 import com.example.taskmanager.data.local.dao.TaskDao;
 import com.example.taskmanager.data.local.entities.Task;
 
-@Database(entities = {Task.class}, version = 1, exportSchema = false)
+@Database(entities = {Task.class}, version = 2, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static volatile AppDatabase INSTANCE;
@@ -20,8 +20,8 @@ public abstract class AppDatabase extends RoomDatabase {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                                    AppDatabase.class, "task_db")
+                    INSTANCE = Room.databaseBuilder(context, AppDatabase.class, "task_database")
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }
