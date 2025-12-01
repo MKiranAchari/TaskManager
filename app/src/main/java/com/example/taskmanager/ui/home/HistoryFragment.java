@@ -42,7 +42,11 @@ public class HistoryFragment extends Fragment {
             @Override public void onComplete(Task task) {
                 // no-op for history
             }
-        });
+            public void onEditClick(Task task) {
+                // Update task via ViewModel
+                vm.update(task);
+            }
+        }, getParentFragmentManager());
         recycler.setAdapter(adapter);
 
         vm = new ViewModelProvider(requireActivity()).get(TaskViewModel.class);

@@ -45,7 +45,12 @@ public class HomeFragment extends Fragment {
                 Snackbar.make(requireActivity().findViewById(android.R.id.content),
                         "Task moved to History", Snackbar.LENGTH_SHORT).show();
             }
-        });
+
+            @Override
+            public void onEditClick(Task task) {
+                vm.update(task); // Save changes
+            }
+        }, getParentFragmentManager());
         recycler.setAdapter(adapter);
 
         vm = new ViewModelProvider(requireActivity()).get(TaskViewModel.class);

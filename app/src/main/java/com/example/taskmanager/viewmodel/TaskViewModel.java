@@ -30,4 +30,14 @@ public class TaskViewModel extends AndroidViewModel {
     public void insert(Task task) { repository.insert(task); }
     public void update(Task task) { repository.update(task); }
     public void delete(Task task) { repository.delete(task); }
+    public Task getTaskByIdSync(int id) {
+        List<Task> allTasks = pendingTasks.getValue();
+        if (allTasks != null) {
+            for (Task t : allTasks) {
+                if (t.getId() == id) return t;
+            }
+        }
+        return null; // handle null case
+    }
+
 }

@@ -13,27 +13,33 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.taskmanager.R;
 import com.example.taskmanager.data.local.entities.Task;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 public class TaskAdapter extends ListAdapter<Task, TaskAdapter.VH> {
 
     public interface TaskActionListener {
         void onDelete(Task task);
         void onComplete(Task task);
+        void onEditClick(Task task);
     }
 
     private final boolean isHistory;
     private final TaskActionListener listener;
-
-    public TaskAdapter(boolean isHistory, TaskActionListener listener) {
+    private final FragmentManager fragmentManager;
+    public TaskAdapter(boolean isHistory, TaskActionListener listener, FragmentManager fragmentManager) {
         super(DIFF);
         this.isHistory = isHistory;
         this.listener = listener;
+        this.fragmentManager = fragmentManager;
     }
 
     private static final DiffUtil.ItemCallback<Task> DIFF = new DiffUtil.ItemCallback<Task>() {
@@ -74,9 +80,24 @@ public class TaskAdapter extends ListAdapter<Task, TaskAdapter.VH> {
         });
 
         holder.itemView.setOnLongClickListener(v -> {
-            showCustomDialog(v.getContext(), t);
+            EditTaskDialogFragment dialog = EditTaskDialogFragment.newInstance(t.getId());
+            dialog.setListener(new EditTaskDialogFragment.EditTaskListener() {
+                @Override
+                public void onTaskUpdated(Task updatedTask) {
+                    notifyItemChanged(holder.getAdapterPosition());
+                }
+
+                @Override
+                public void onTaskDeleted(Task deletedTask) {
+                    notifyItemRemoved(holder.getAdapterPosition());
+                }
+            });
+
+            // Pass FragmentManager from Activity/Fragment
+            dialog.show(fragmentManager, "edit_task");
             return true;
         });
+
 
     }
 
@@ -94,11 +115,11 @@ public class TaskAdapter extends ListAdapter<Task, TaskAdapter.VH> {
         }
     }
 
-    private void showCustomDialog(Context context, Task t) {
+    private void showCustomDialog(Context context, Task task) {
         Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.dialog);
 
-        // Optional: remove default title bar
+        // Remove default title bar
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
@@ -106,29 +127,60 @@ public class TaskAdapter extends ListAdapter<Task, TaskAdapter.VH> {
         // Dismiss when tapping outside
         dialog.setCancelable(true);
 
-        // Get views
+        // Views
         TextView tvTitle = dialog.findViewById(R.id.dialog_Title);
-        Button btnEdit = dialog.findViewById(R.id.btnEdit);
-        Button btnDelete = dialog.findViewById(R.id.btnDelete);
         TextView tvDesc = dialog.findViewById(R.id.dialog_Desc);
         TextView tvTime = dialog.findViewById(R.id.dialog_Time);
+        Button btnEdit = dialog.findViewById(R.id.btnEdit);
+        Button btnDelete = dialog.findViewById(R.id.btnDelete);
+        TextInputLayout editLayout = dialog.findViewById(R.id.dialog_Desc_edit);
+        TextInputEditText editText = dialog.findViewById(R.id.dialog_edit_task);
 
-        tvTitle.setText(t.getTitle());
-        tvDesc.setText(t.getDescription());
-        tvTime.setText(t.getDateTime());
+        // Initialize UI
+        tvTitle.setText(task.getTitle());
+        tvDesc.setText(task.getDescription());
+        tvTime.setText(task.getDateTime());
+        editText.setText(task.getDescription());
+        editLayout.setVisibility(View.GONE); // hide edit text initially
 
+        // Edit button logic
         btnEdit.setOnClickListener(v -> {
-            Toast.makeText(context, "Edit clicked", Toast.LENGTH_SHORT).show();
-            dialog.dismiss();
+            if (editLayout.getVisibility() == View.GONE) {
+                // First click → enable editing
+                tvDesc.setVisibility(View.GONE);
+                editLayout.setVisibility(View.VISIBLE);
+                btnEdit.setText("Save");
+            } else {
+                // Second click → save changes
+                String newDesc = editText.getText().toString().trim();
+                if (!newDesc.isEmpty()) {
+                    task.setDescription(newDesc);
+
+                    // Use listener to update task via ViewModel in Fragment
+                    if (listener != null) listener.onEditClick(task);
+
+                    tvDesc.setText(newDesc);
+                    tvDesc.setVisibility(View.VISIBLE);
+                    editLayout.setVisibility(View.GONE);
+                    btnEdit.setText("Edit");
+
+                    Toast.makeText(context, "Task updated", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                } else {
+                    editText.setError("Description cannot be empty");
+                }
+            }
         });
 
+        // Delete button
         btnDelete.setOnClickListener(v -> {
-            Toast.makeText(context, "Delete clicked", Toast.LENGTH_SHORT).show();
-            if (listener != null) listener.onDelete(t);
+            if (listener != null) listener.onDelete(task);
+            Toast.makeText(context, "Task deleted", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
         });
 
         dialog.show();
     }
+
 
 }

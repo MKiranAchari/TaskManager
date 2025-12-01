@@ -33,4 +33,8 @@ public class Task {
     public boolean isCompleted() { return completed; }
     public void setCompleted(boolean completed) { this.completed = completed; }
     public Integer getPriority() { return priority; }
+
+    public void setTitle(String title) { this.title = title; }
+    public void setDescription(String description) { this.description = description; }
+    public void setDateTime(String dateTime) { this.dateTime = dateTime; }
 }
